@@ -12,6 +12,8 @@ export function ProfileForm({ user }: Props) {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -24,6 +26,8 @@ export function ProfileForm({ user }: Props) {
         setError(
           err instanceof Error ? err.message : 'Failed to load profile',
         );
+      } finally {
+        setLoading(false);
       }
     }
     load();
@@ -43,12 +47,15 @@ export function ProfileForm({ user }: Props) {
       return;
     }
 
+    setSaving(true);
     try {
       const token = await user.getIdToken();
       await updateProfile(token, { name: name.trim(), email: email.trim() });
       setMessage('Profile saved');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save profile');
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -56,35 +63,86 @@ export function ProfileForm({ user }: Props) {
     await signOut(auth);
   }
 
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center mt-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <h1>Profile</h1>
-      <form onSubmit={handleSave}>
-        <div>
-          <label>
-            Name
+    <div className="card shadow-sm mt-4">
+      <div className="card-body p-4">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2 className="card-title mb-0">Profile</h2>
+          <button
+            className="btn btn-outline-secondary btn-sm"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
+
+        <form onSubmit={handleSave}>
+          <div className="mb-3">
+            <label htmlFor="name" className="form-label">
+              Name
+            </label>
             <input
+              id="name"
               type="text"
+              className="form-control"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              disabled={saving}
             />
-          </label>
-        </div>
-        <div>
-          <label>
-            Email
+          </div>
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
             <input
+              id="email"
               type="email"
+              className="form-control"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={saving}
             />
-          </label>
-        </div>
-        <button type="submit">Save</button>
-      </form>
-      {message && <p style={{ color: 'green' }}>{message}</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button onClick={handleLogout}>Logout</button>
+          </div>
+          <button
+            type="submit"
+            className="btn btn-primary w-100"
+            disabled={saving}
+          >
+            {saving ? (
+              <>
+                <span
+                  className="spinner-border spinner-border-sm me-2"
+                  role="status"
+                />
+                Saving...
+              </>
+            ) : (
+              'Save'
+            )}
+          </button>
+        </form>
+
+        {message && (
+          <div className="alert alert-success mt-3 mb-0" role="alert">
+            {message}
+          </div>
+        )}
+        {error && (
+          <div className="alert alert-danger mt-3 mb-0" role="alert">
+            {error}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

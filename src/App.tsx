@@ -17,12 +17,18 @@ export function App() {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
-  if (!user) {
-    return <LoginForm />;
-  }
-
-  return <ProfileForm user={user} />;
+  return (
+    <div className="container py-4" style={{ maxWidth: '540px' }}>
+      {!user ? <LoginForm /> : <ProfileForm user={user} />}
+    </div>
+  );
 }
