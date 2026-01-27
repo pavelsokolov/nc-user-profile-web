@@ -1,115 +1,101 @@
-import { useState, useRef, useEffect, type FormEvent } from 'react';
+import { useState, useRef, useEffect, type FormEvent } from 'react'
 import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   type ConfirmationResult,
   type AuthError,
-} from 'firebase/auth';
-import { PhoneInput } from 'react-international-phone';
-import 'react-international-phone/style.css';
-import { auth } from '../firebase.ts';
+} from 'firebase/auth'
+import { PhoneInput } from 'react-international-phone'
+import 'react-international-phone/style.css'
+import { auth } from '../firebase.ts'
 
 const firebaseErrorMessages: Record<string, string> = {
   'auth/invalid-phone-number':
     'The phone number is not valid. Please check the country code and number.',
-  'auth/too-many-requests':
-    'Too many attempts. Please wait a moment and try again.',
-  'auth/quota-exceeded':
-    'SMS quota exceeded. Please try again later.',
-  'auth/captcha-check-failed':
-    'reCAPTCHA verification failed. Please try again.',
+  'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
+  'auth/quota-exceeded': 'SMS quota exceeded. Please try again later.',
+  'auth/captcha-check-failed': 'reCAPTCHA verification failed. Please try again.',
   'auth/invalid-verification-code':
     'The verification code is incorrect. Please check and try again.',
-  'auth/code-expired':
-    'The verification code has expired. Please request a new one.',
-};
+  'auth/code-expired': 'The verification code has expired. Please request a new one.',
+}
 
 function getErrorMessage(err: unknown): string {
   if (typeof err === 'object' && err !== null && 'code' in err) {
-    const code = (err as AuthError).code;
+    const code = (err as AuthError).code
     if (code in firebaseErrorMessages) {
-      return firebaseErrorMessages[code];
+      return firebaseErrorMessages[code]
     }
   }
-  return 'Something went wrong. Please try again.';
+  return 'Something went wrong. Please try again.'
 }
 
 export function LoginForm() {
-  const [phone, setPhone] = useState('');
-  const [code, setCode] = useState('');
-  const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(
-    null,
-  );
-  const [error, setError] = useState('');
-  const [sending, setSending] = useState(false);
-  const [verifying, setVerifying] = useState(false);
-  const recaptchaRef = useRef<HTMLDivElement>(null);
-  const verifierRef = useRef<RecaptchaVerifier | null>(null);
+  const [phone, setPhone] = useState('')
+  const [code, setCode] = useState('')
+  const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null)
+  const [error, setError] = useState('')
+  const [sending, setSending] = useState(false)
+  const [verifying, setVerifying] = useState(false)
+  const recaptchaRef = useRef<HTMLDivElement>(null)
+  const verifierRef = useRef<RecaptchaVerifier | null>(null)
 
   useEffect(() => {
     if (recaptchaRef.current && !verifierRef.current) {
       verifierRef.current = new RecaptchaVerifier(auth, recaptchaRef.current, {
         size: 'invisible',
-      });
+      })
     }
     return () => {
-      verifierRef.current?.clear();
-      verifierRef.current = null;
-    };
-  }, []);
+      verifierRef.current?.clear()
+      verifierRef.current = null
+    }
+  }, [])
 
   async function handleSendCode(e: FormEvent) {
-    e.preventDefault();
-    setError('');
-    const e164 = '+' + phone.replace(/\D/g, '');
+    e.preventDefault()
+    setError('')
+    const e164 = '+' + phone.replace(/\D/g, '')
     if (e164.length < 8 || e164.length > 16) {
-      setError('Please enter a valid phone number.');
-      return;
+      setError('Please enter a valid phone number.')
+      return
     }
-    setSending(true);
+    setSending(true)
     try {
-      const result = await signInWithPhoneNumber(
-        auth,
-        e164,
-        verifierRef.current!,
-      );
-      setConfirmation(result);
+      const result = await signInWithPhoneNumber(auth, e164, verifierRef.current!)
+      setConfirmation(result)
     } catch (err) {
-      setError(getErrorMessage(err));
-      verifierRef.current?.clear();
-      verifierRef.current = null;
+      setError(getErrorMessage(err))
+      verifierRef.current?.clear()
+      verifierRef.current = null
       if (recaptchaRef.current) {
-        recaptchaRef.current.innerHTML = '';
-        verifierRef.current = new RecaptchaVerifier(
-          auth,
-          recaptchaRef.current,
-          { size: 'invisible' },
-        );
+        recaptchaRef.current.innerHTML = ''
+        verifierRef.current = new RecaptchaVerifier(auth, recaptchaRef.current, {
+          size: 'invisible',
+        })
       }
     } finally {
-      setSending(false);
+      setSending(false)
     }
   }
 
   async function handleVerifyCode(e: FormEvent) {
-    e.preventDefault();
-    setError('');
-    setVerifying(true);
+    e.preventDefault()
+    setError('')
+    setVerifying(true)
     try {
-      await confirmation!.confirm(code);
+      await confirmation!.confirm(code)
     } catch (err) {
-      setError(getErrorMessage(err));
+      setError(getErrorMessage(err))
     } finally {
-      setVerifying(false);
+      setVerifying(false)
     }
   }
 
   return (
     <div className="card shadow-sm mt-5">
       <div className="card-body p-4">
-        <h2 className="card-title text-center mb-4">
-          {confirmation ? 'Verify Code' : 'Sign In'}
-        </h2>
+        <h2 className="card-title text-center mb-4">{confirmation ? 'Verify Code' : 'Sign In'}</h2>
 
         {!confirmation ? (
           <form onSubmit={handleSendCode} autoComplete="on">
@@ -149,17 +135,10 @@ export function LoginForm() {
                 }}
               />
             </div>
-            <button
-              type="submit"
-              className="btn btn-primary w-100"
-              disabled={sending}
-            >
+            <button type="submit" className="btn btn-primary w-100" disabled={sending}>
               {sending ? (
                 <>
-                  <span
-                    className="spinner-border spinner-border-sm me-2"
-                    role="status"
-                  />
+                  <span className="spinner-border spinner-border-sm me-2" role="status" />
                   Sending...
                 </>
               ) : (
@@ -186,17 +165,10 @@ export function LoginForm() {
                 disabled={verifying}
               />
             </div>
-            <button
-              type="submit"
-              className="btn btn-primary w-100"
-              disabled={verifying}
-            >
+            <button type="submit" className="btn btn-primary w-100" disabled={verifying}>
               {verifying ? (
                 <>
-                  <span
-                    className="spinner-border spinner-border-sm me-2"
-                    role="status"
-                  />
+                  <span className="spinner-border spinner-border-sm me-2" role="status" />
                   Verifying...
                 </>
               ) : (
@@ -223,5 +195,5 @@ export function LoginForm() {
         <div ref={recaptchaRef} />
       </div>
     </div>
-  );
+  )
 }

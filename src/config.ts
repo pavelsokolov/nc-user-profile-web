@@ -5,4 +5,4 @@ export const config = {
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string,
     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID as string,
   },
-};
+}

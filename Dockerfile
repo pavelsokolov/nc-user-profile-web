@@ -2,7 +2,7 @@ FROM node:22-slim AS build
 WORKDIR /app
 RUN corepack enable pnpm
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 COPY . .
 ARG VITE_API_BASE_URL
 ARG VITE_FIREBASE_API_KEY
