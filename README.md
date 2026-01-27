@@ -33,6 +33,16 @@ pnpm dev
 
 Opens at `http://localhost:5173`.
 
+### Local dev with Firebase emulators
+
+To use the Firebase Auth emulator with `pnpm dev`, add to your `.env`:
+
+```
+VITE_FIREBASE_AUTH_EMULATOR_URL=http://localhost:9099
+```
+
+Start the emulators via Docker Compose from the **nc-user-profile-api** repo (see its README), then run `pnpm dev` as usual.
+
 ### Run with Docker Compose (both services)
 
 See `docker-compose.yml` in the **nc-user-profile-api** repo. Both repos must be cloned as siblings. From the API repo:
@@ -43,6 +53,7 @@ docker compose up --build
 
 - API: `http://localhost:8080`
 - Frontend: `http://localhost:3000`
+- Emulator UI: `http://localhost:4000`
 
 ### Run frontend standalone with Docker
 
