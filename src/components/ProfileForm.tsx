@@ -18,14 +18,11 @@ export function ProfileForm({ user }: Props) {
   useEffect(() => {
     async function load() {
       try {
-        const token = await user.getIdToken();
-        const profile = await getProfile(token);
+        const profile = await getProfile(user);
         setName(profile.name);
         setEmail(profile.email);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to load profile',
-        );
+      } catch {
+        // Profile not found or network error — treat as new user with empty fields
       } finally {
         setLoading(false);
       }
@@ -49,11 +46,12 @@ export function ProfileForm({ user }: Props) {
 
     setSaving(true);
     try {
-      const token = await user.getIdToken();
-      await updateProfile(token, { name: name.trim(), email: email.trim() });
+      await updateProfile(user, { name: name.trim(), email: email.trim() });
       setMessage('Profile saved');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save profile');
+      setError(
+        err instanceof Error ? err.message : 'Something went wrong. Please try again.',
+      );
     } finally {
       setSaving(false);
     }

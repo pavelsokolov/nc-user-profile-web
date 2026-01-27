@@ -3,10 +3,36 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   type ConfirmationResult,
+  type AuthError,
 } from 'firebase/auth';
 import { PhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
 import { auth } from '../firebase.ts';
+
+const firebaseErrorMessages: Record<string, string> = {
+  'auth/invalid-phone-number':
+    'The phone number is not valid. Please check the country code and number.',
+  'auth/too-many-requests':
+    'Too many attempts. Please wait a moment and try again.',
+  'auth/quota-exceeded':
+    'SMS quota exceeded. Please try again later.',
+  'auth/captcha-check-failed':
+    'reCAPTCHA verification failed. Please try again.',
+  'auth/invalid-verification-code':
+    'The verification code is incorrect. Please check and try again.',
+  'auth/code-expired':
+    'The verification code has expired. Please request a new one.',
+};
+
+function getErrorMessage(err: unknown): string {
+  if (typeof err === 'object' && err !== null && 'code' in err) {
+    const code = (err as AuthError).code;
+    if (code in firebaseErrorMessages) {
+      return firebaseErrorMessages[code];
+    }
+  }
+  return 'Something went wrong. Please try again.';
+}
 
 export function LoginForm() {
   const [phone, setPhone] = useState('');
@@ -35,16 +61,21 @@ export function LoginForm() {
   async function handleSendCode(e: FormEvent) {
     e.preventDefault();
     setError('');
+    const e164 = '+' + phone.replace(/\D/g, '');
+    if (e164.length < 8 || e164.length > 16) {
+      setError('Please enter a valid phone number.');
+      return;
+    }
     setSending(true);
     try {
       const result = await signInWithPhoneNumber(
         auth,
-        phone,
+        e164,
         verifierRef.current!,
       );
       setConfirmation(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send code');
+      setError(getErrorMessage(err));
       verifierRef.current?.clear();
       verifierRef.current = null;
       if (recaptchaRef.current) {
@@ -67,7 +98,7 @@ export function LoginForm() {
     try {
       await confirmation!.confirm(code);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid code');
+      setError(getErrorMessage(err));
     } finally {
       setVerifying(false);
     }
@@ -91,12 +122,30 @@ export function LoginForm() {
                 value={phone}
                 onChange={setPhone}
                 disabled={sending}
+                inputStyle={{
+                  height: '38px',
+                  fontSize: '1rem',
+                  border: '1px solid #dee2e6',
+                  borderLeft: 'none',
+                  borderRadius: '0 0.375rem 0.375rem 0',
+                  width: '100%',
+                }}
+                countrySelectorStyleProps={{
+                  buttonStyle: {
+                    height: '38px',
+                    border: '1px solid #dee2e6',
+                    borderRight: 'none',
+                    borderRadius: '0.375rem 0 0 0.375rem',
+                    paddingInline: '10px',
+                    background: '#f8f9fa',
+                  },
+                }}
+                style={{ width: '100%' }}
                 inputProps={{
                   id: 'phone',
                   name: 'tel',
                   autoComplete: 'tel',
                   required: true,
-                  className: 'form-control',
                 }}
               />
             </div>
