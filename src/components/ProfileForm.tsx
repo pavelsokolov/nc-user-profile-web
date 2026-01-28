@@ -30,14 +30,6 @@ export function ProfileForm({ user }: Props) {
     e.preventDefault()
     setError('')
     setMessage('')
-    if (!name.trim()) {
-      setError('Name is required')
-      return
-    }
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Valid email is required')
-      return
-    }
     setSaving(true)
     try {
       await updateProfile(user, { name: name.trim(), email: email.trim() })

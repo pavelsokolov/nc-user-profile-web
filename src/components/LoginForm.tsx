@@ -59,8 +59,8 @@ export function LoginForm() {
     setError('')
     const e164 = '+' + phone.replace(/\D/g, '')
     if (e164.length < 8 || e164.length > 16) {
-      setError('Please enter a valid phone number.')
-      return
+      //   setError('Please enter a valid phone number.')
+      //   return
     }
     setSending(true)
     try {
