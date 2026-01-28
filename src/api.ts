@@ -48,7 +48,7 @@ async function authFetch(user: User, input: string, init?: RequestInit): Promise
 }
 
 export async function getProfile(user: User): Promise<ProfileData> {
-  const response = await authFetch(user, `${config.apiBaseUrl}/profile`)
+  const response = await authFetch(user, `${config.apiBaseUrl}/api/profile`)
   if (!response.ok) {
     throw new ApiError(await parseErrorMessage(response), response.status)
   }
@@ -56,7 +56,7 @@ export async function getProfile(user: User): Promise<ProfileData> {
 }
 
 export async function updateProfile(user: User, data: ProfileUpdate): Promise<ProfileData> {
-  const response = await authFetch(user, `${config.apiBaseUrl}/profile`, {
+  const response = await authFetch(user, `${config.apiBaseUrl}/api/profile`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
