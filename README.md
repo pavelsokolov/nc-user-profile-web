@@ -2,7 +2,7 @@
 
 React SPA for user profile management with Firebase phone auth.
 
-**Related:** backend repo -- [nc-user-profile-api](https://github.com/pavelsokolov/nc-user-profile-api)
+**Related:** backend repo — [nc-user-profile-api](https://github.com/pavelsokolov/nc-user-profile-api)
 
 ## Tech stack
 
