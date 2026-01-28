@@ -2,6 +2,8 @@
 
 React SPA for user profile management with Firebase phone auth.
 
+**Related:** backend repo -- [nc-user-profile-api](https://github.com/pavelsokolov/nc-user-profile-api)
+
 ## Tech stack
 
 React 19, TypeScript 5.6, Vite 6, Firebase SDK 11 (phone auth + reCAPTCHA), Bootstrap 5.3, CSS Modules, react-international-phone, ESLint 9, Prettier 3, pnpm.
@@ -58,6 +60,11 @@ Frontend: `:3000` | API: `:8080` | Emulator UI: `:4000` | Auth emulator: `:9099`
 
 SMS verification codes: `curl http://localhost:9099/emulator/v1/projects/demo-project/verificationCodes`
 
-## Build
+## Deployment (Firebase Hosting)
 
-Multi-stage Dockerfile: Node 22 build → Nginx Alpine with SPA fallback routing.
+```bash
+pnpm build
+firebase deploy --only hosting
+```
+
+Requires the [Firebase CLI](https://firebase.google.com/docs/cli) (`npm install -g firebase-tools`) and being logged in (`firebase login`). The `firebase.json` is pre-configured to serve `dist/` with SPA rewrites.
