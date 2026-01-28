@@ -41,20 +41,10 @@ async function parseErrorMessage(response: Response): Promise<string> {
 
 async function authFetch(user: User, input: string, init?: RequestInit): Promise<Response> {
   const token = await user.getIdToken()
-  const response = await fetch(input, {
+  return fetch(input, {
     ...init,
     headers: { ...init?.headers, Authorization: `Bearer ${token}` },
   })
-
-  if (response.status === 401) {
-    const freshToken = await user.getIdToken(true)
-    return fetch(input, {
-      ...init,
-      headers: { ...init?.headers, Authorization: `Bearer ${freshToken}` },
-    })
-  }
-
-  return response
 }
 
 export async function getProfile(user: User): Promise<ProfileData> {
