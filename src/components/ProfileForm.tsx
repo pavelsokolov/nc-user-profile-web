@@ -22,7 +22,9 @@ export function ProfileForm({ user }: Props) {
         setName(p.name)
         setEmail(p.email)
       })
-      .catch(() => {})
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : 'Failed to load profile.')
+      })
       .finally(() => setLoading(false))
   }, [user])
 
