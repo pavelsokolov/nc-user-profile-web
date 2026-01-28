@@ -1,0 +1,42 @@
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+}
+
+.card {
+  margin-top: 1.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.cardBody {
+  padding: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  margin-bottom: 0;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+.submitBtn {
+  width: 100%;
+}
+
+.spinner {
+  margin-right: 0.5rem;
+}
+
+.alert {
+  margin-top: 1rem;
+  margin-bottom: 0;
+}

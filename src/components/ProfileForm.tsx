@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { signOut, type User } from 'firebase/auth'
 import { auth } from '../firebase.ts'
 import { getProfile, updateProfile } from '../api.ts'
+import styles from '../styles/ProfileForm.module.css'
 
 interface Props {
   user: User
@@ -16,25 +17,19 @@ export function ProfileForm({ user }: Props) {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    async function load() {
-      try {
-        const profile = await getProfile(user)
-        setName(profile.name)
-        setEmail(profile.email)
-      } catch {
-        // Profile not found or network error — treat as new user with empty fields
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
+    getProfile(user)
+      .then((p) => {
+        setName(p.name)
+        setEmail(p.email)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }, [user])
 
   async function handleSave(e: FormEvent) {
     e.preventDefault()
     setError('')
     setMessage('')
-
     if (!name.trim()) {
       setError('Name is required')
       return
@@ -43,25 +38,20 @@ export function ProfileForm({ user }: Props) {
       setError('Valid email is required')
       return
     }
-
     setSaving(true)
     try {
       await updateProfile(user, { name: name.trim(), email: email.trim() })
       setMessage('Profile saved')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      setError(err instanceof Error ? err.message : 'Something went wrong.')
     } finally {
       setSaving(false)
     }
   }
 
-  async function handleLogout() {
-    await signOut(auth)
-  }
-
   if (loading) {
     return (
-      <div className="d-flex justify-content-center mt-5">
+      <div className={styles.loadingContainer}>
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -70,17 +60,17 @@ export function ProfileForm({ user }: Props) {
   }
 
   return (
-    <div className="card shadow-sm mt-4">
-      <div className="card-body p-4">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="card-title mb-0">Profile</h2>
-          <button className="btn btn-outline-secondary btn-sm" onClick={handleLogout}>
+    <div className={`card ${styles.card}`}>
+      <div className={styles.cardBody}>
+        <div className={styles.header}>
+          <h2 className={`card-title ${styles.title}`}>Profile</h2>
+          <button className="btn btn-outline-secondary btn-sm" onClick={() => signOut(auth)}>
             Logout
           </button>
         </div>
 
         <form onSubmit={handleSave}>
-          <div className="mb-3">
+          <div className={styles.field}>
             <label htmlFor="name" className="form-label">
               Name
             </label>
@@ -93,7 +83,7 @@ export function ProfileForm({ user }: Props) {
               disabled={saving}
             />
           </div>
-          <div className="mb-3">
+          <div className={styles.field}>
             <label htmlFor="email" className="form-label">
               Email
             </label>
@@ -106,10 +96,10 @@ export function ProfileForm({ user }: Props) {
               disabled={saving}
             />
           </div>
-          <button type="submit" className="btn btn-primary w-100" disabled={saving}>
+          <button type="submit" className={`btn btn-primary ${styles.submitBtn}`} disabled={saving}>
             {saving ? (
               <>
-                <span className="spinner-border spinner-border-sm me-2" role="status" />
+                <span className={`spinner-border spinner-border-sm ${styles.spinner}`} />
                 Saving...
               </>
             ) : (
@@ -119,12 +109,12 @@ export function ProfileForm({ user }: Props) {
         </form>
 
         {message && (
-          <div className="alert alert-success mt-3 mb-0" role="alert">
+          <div className={`alert alert-success ${styles.alert}`} role="alert">
             {message}
           </div>
         )}
         {error && (
-          <div className="alert alert-danger mt-3 mb-0" role="alert">
+          <div className={`alert alert-danger ${styles.alert}`} role="alert">
             {error}
           </div>
         )}

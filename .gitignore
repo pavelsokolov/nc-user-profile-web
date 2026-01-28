@@ -6,3 +6,7 @@ dist
 /out-tsc
 .DS_Store
 .idea
+test-results
+playwright-report
+.firebase
+*.tsbuildinfo
