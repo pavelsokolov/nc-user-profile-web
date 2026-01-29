@@ -17,25 +17,20 @@
 }
 
 .phoneInput {
-  width: 100%;
+  --react-international-phone-height: 38px;
+  --react-international-phone-border-color: #dee2e6;
+  --react-international-phone-border-radius: 0.375rem;
+  --react-international-phone-font-size: 1rem;
+  --react-international-phone-country-selector-background-color: #f8f9fa;
 }
 
-.phoneInput input {
-  height: 38px;
-  font-size: 1rem;
-  border: 1px solid #dee2e6;
-  border-left: none;
-  border-radius: 0 0.375rem 0.375rem 0;
-  width: 100%;
+.phoneInput :global(.react-international-phone-country-selector-button) {
+  padding: 0 10px;
 }
 
-.phoneInput button {
-  height: 38px;
-  border: 1px solid #dee2e6;
-  border-right: none;
-  border-radius: 0.375rem 0 0 0.375rem;
-  padding-inline: 10px;
-  background: #f8f9fa;
+.phoneInput :global(.react-international-phone-input) {
+  width: 100%;
+  padding: 0.375rem 0.75rem;
 }
 
 .submitBtn {
